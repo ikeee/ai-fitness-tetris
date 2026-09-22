@@ -35,7 +35,9 @@ Built as a classroom demo for an **AI & STEAM** programme. Runs 100% in the brow
 
 ## Run
 
-Camera access requires a **secure context**, so serve over `localhost` (not `file://`):
+**▶ Play online:** <https://ikeee.github.io/ai-fitness-tetris/> — served over HTTPS, so the camera works right away.
+
+Or run it locally. Camera access requires a **secure context**, so serve over `localhost` (not `file://`):
 
 ```bash
 python serve.py        # → http://127.0.0.1:8000/
