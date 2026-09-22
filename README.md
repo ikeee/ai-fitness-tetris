@@ -1,7 +1,7 @@
 # AI Fitness Tetris 🎮
 
 A **webcam-controlled Tetris** — steer with your head, rotate and drop with your hands.
-Built as a classroom demo for **Minxin School · AI & STEAM**. Runs 100% in the browser
+Built as a classroom demo for an **AI & STEAM** programme. Runs 100% in the browser
 (pose inference is local), no build step, no backend.
 
 ![Gameplay](_screenshots/v6-fullscreen-play.png)
