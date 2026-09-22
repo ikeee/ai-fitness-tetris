@@ -304,6 +304,27 @@ function setCtl(l,r,b){
   ctlDrop.classList.toggle("active",!!b);
 }
 
+/* ---------- 头部横移控制（纯逻辑，便于单测） ----------
+   把"头部相对中性位的偏移量"量化成格子位移：
+   - 只有"向外扩"(离中性位更远)才产生移动 —— 与距离成正比：偏 1 档走 1 格、偏 2 档走 2 格；
+   - 回到中性位 / 回程途中一律不移动方块（修掉"头回位把方块带回一格"的问题）；
+   - 单次最多 3 格，防止一帧跳太远。
+   返回：>0 右移 n 格；<0 左移 n 格；0 不动。 */
+const headState={zone:0,holdMs:0,lastT:0};
+function headControl(delta,step,dead,st){
+  const mag=Math.abs(delta);
+  const zone = mag<=dead ? 0 : Math.sign(delta)*Math.min(4,Math.ceil((mag-dead)/step));
+  let cells=0;
+  if(zone!==st.zone){
+    const sameSide = st.zone!==0 && Math.sign(zone)===Math.sign(st.zone);
+    const base = sameSide ? Math.abs(st.zone) : 0;
+    const out = Math.abs(zone)-base;          // 只有"向外"的部分才算位移
+    if(out>0) cells=Math.sign(zone)*Math.min(out,3);
+    st.zone=zone;
+  }
+  return cells;
+}
+
 function processPose(now){
   if(!poseLandmarker || !cameraReady || video.readyState<2) return;
   if(now-lastPose<40) return;
@@ -312,7 +333,7 @@ function processPose(now){
   const lm=r.landmarks?.[0];
   drawGridAndPose(lm);
   if(!lm){
-    if(++lostFrames>5){ poseState="未检测到人体"; setCtl(false,false,false); actionLatch={left:false,right:false,both:false}; }
+    if(++lostFrames>5){ poseState="未检测到人体"; setCtl(false,false,false); actionLatch={left:false,right:false,both:false}; headState.zone=0; headState.holdMs=0; }
     return;
   }
   lostFrames=0;
@@ -320,15 +341,26 @@ function processPose(now){
   const nose=lm[0], ls=lm[11], rs=lm[12], lw=lm[15], rw=lm[16];
   if(!vis(nose)||!vis(ls)||!vis(rs)){ poseState="请站进画面"; setCtl(false,false,false); return; }
 
-  // —— 头部移动：EMA 平滑 + 死区 + 移动量按肩宽自适应 ——
+  // —— 头部移动：EMA 平滑 + 绝对中性位 + "只向外扩"棘轮（回程不带走方块）——
   const shoulderW=Math.max(0.05, Math.abs(ls.x-rs.x));
   const headX=1-nose.x;
   headSmooth = headSmooth===null ? headX : headSmooth*0.6 + headX*0.4;
   lastHeadX=headSmooth;
   if(baselineSamples.length<15){ baselineSamples.push(headSmooth); headBaseline=baselineSamples.reduce((a,b)=>a+b,0)/baselineSamples.length; }
   const centerDelta=headSmooth-headBaseline;
-  const deadZone=0.025, moveStep=shoulderW*0.28;
-  if(Math.abs(centerDelta)>deadZone+moveStep){ move(centerDelta<0?-1:1); headBaseline+=Math.sign(centerDelta)*moveStep; }
+  const moveStep=Math.min(0.085,Math.max(0.035,shoulderW*0.26));   // 随肩宽自适应（含上下限：远距离不过敏、近距离不迟钝）
+  const deadZone=Math.max(0.02,moveStep*0.6);
+  const cells=headControl(centerDelta,moveStep,deadZone,headState);
+  if(cells) for(let i=0,n=Math.abs(cells);i<n;i++) move(Math.sign(cells));
+  // 停在中性位 >0.8s → 极缓慢重定基准（补偿站姿漂移）；回程过程中绝不重置、也不移动方块
+  const hdt=Math.max(20,Math.min(150,now-(headState.lastT||now)));
+  headState.lastT=now;
+  if(Math.abs(centerDelta)<=deadZone){
+    headState.holdMs+=hdt;
+    if(headState.holdMs>800) headBaseline+=centerDelta*Math.min(0.25,hdt/1000*1.2);
+  }else{
+    headState.holdMs=0;
+  }
 
   // —— 手下压：以肩为参考、肩宽归一、EMA 平滑 + 迟滞阈值（进入0.55/退出0.40）——
   const leftAmt=vis(lw)?(lw.y-ls.y)/shoulderW:0;
@@ -538,6 +570,7 @@ async function start(){
     if(!cameraReady) await startCamera();
     running=true; paused=false; gameOver=false; pauseBtn.disabled=false; pauseBtn.textContent="Pause"; startBtn.textContent="Session Active"; startBtn.disabled=true; messageEl.textContent="Move your head left / right to steer — drop a hand to rotate — both hands down to hard-drop.";
     headSmooth=null; headBaseline=null; baselineSamples=[]; leftHandSmooth=0; rightHandSmooth=0; lostFrames=0; actionLatch={left:false,right:false,both:false};
+    headState.zone=0; headState.holdMs=0; headState.lastT=0;
     if(!lessonDone) beginLesson();
     musicStart();
     requestAnimationFrame(loop);
