@@ -4,7 +4,11 @@ A **webcam-controlled Tetris** — steer with your head, rotate and drop with yo
 Built as a classroom demo for an **AI & STEAM** programme. Runs 100% in the browser
 (pose inference is local), no build step, no backend.
 
-![Gameplay](_screenshots/v6-fullscreen-play.png)
+![Attract screen](_screenshots/v10-neutral-branding.png)
+
+![Gameplay](_screenshots/v11-gameplay.png)
+
+![Game over](_screenshots/v11-gameover.png)
 
 ## Features
 - **Full-screen camera stage** — the live camera fills the screen and the whole HUD floats on top of it
