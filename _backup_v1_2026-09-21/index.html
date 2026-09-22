@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>体感俄罗斯方块 · AI Fitness Tetris</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="stage" id="stage">
+      <video id="video" autoplay muted playsinline></video>
+      <canvas id="overlay"></canvas>
+
+      <!-- 顶部 HUD 条：P1 光环点 + 大字号分数 + 连击 -->
+      <div class="hud-top">
+        <span class="p1"><span id="cameraDot" class="dot"></span>P1</span>
+        <span class="score-block">SCORE <strong id="score">0</strong><em id="combo" class="combo"></em></span>
+      </div>
+
+      <!-- 棋盘柱：NEXT/LV 顶条 + 棋盘 + 升级进度条 -->
+      <div class="board-shell" aria-label="俄罗斯方块游戏区">
+        <div class="board-top">
+          <span class="next-box">NEXT <canvas id="nextCanvas" width="120" height="96"></canvas></span>
+          <span class="lv-box">LV <strong id="level">1</strong></span>
+        </div>
+        <div class="board-frame">
+          <canvas id="board" width="320" height="640"></canvas>
+          <div id="floatLayer" class="float-layer"></div>
+        </div>
+        <div class="xp-bar"><div id="xpFill" class="xp-fill"></div><span class="xp-label">NEXT LV</span></div>
+      </div>
+
+      <!-- 手柄按键帽：LB / A / RB -->
+      <div class="pad">
+        <div class="cap cap-lb" id="ctlRotL"><b>LB</b><span>ROT_L</span></div>
+        <div class="cap cap-a" id="ctlDrop"><b>A</b><span>DROP</span></div>
+        <div class="cap cap-rb" id="ctlRotR"><b>RB</b><span>ROT_R</span></div>
+      </div>
+
+      <!-- 底部图例行 -->
+      <div class="hud-legend">HEAD ◍ MOVE&ensp;·&ensp;LT✋ ROT_L&ensp;·&ensp;RT✋ ROT_R&ensp;·&ensp;LT+RT✋ DROP&ensp;·&ensp;KEY ←→ Q E SPACE</div>
+
+      <!-- PAUSED 刀片菜单 -->
+      <div id="pauseOverlay" class="pause-overlay">
+        <div class="pause-title">▮▮ PAUSED</div>
+        <div class="pause-menu">
+          <button id="pauseContinue" class="pause-item">▸ CONTINUE</button>
+          <button id="pauseRestart" class="pause-item">&ensp;RESTART</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="control-bar">
+      <button id="startBtn" class="primary">启动摄像头并开始</button>
+      <button id="pauseBtn" disabled>暂停</button>
+      <button id="restartBtn">重新开始</button>
+      <label class="toggle">
+        <input id="mirrorToggle" type="checkbox" checked />
+        <span>镜像摄像头</span>
+      </label>
+      <span class="cam-status"><strong id="cameraStatus">摄像头未启动</strong></span>
+      <div id="message" class="message">建议站在摄像头前 1.5–3 米，双手举起进入准备姿势。</div>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

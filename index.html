@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#04070d" />
+  <title>Fitness Tetris · AI Motion Arcade</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="shell">
+
+    <!-- ===== Top bar: brand + system chips ===== -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-text">
+          <strong>FITNESS&nbsp;TETRIS</strong>
+          <small>AI MOTION ARCADE · MINXIN AI&amp;STEAM</small>
+        </span>
+      </div>
+      <div class="chips">
+        <span id="tutChip" class="tut-chip"></span>
+        <span class="chip"><span id="cameraDot" class="dot"></span><span id="cameraStatus">CAMERA OFFLINE</span></span>
+        <span class="chip chip-best">BEST <b id="bestScore">0</b></span>
+        <span class="chip chip-p1">P1</span>
+      </div>
+    </header>
+
+    <!-- ===== Main console layout ===== -->
+    <main class="game">
+
+      <!-- LEFT RAIL -->
+      <aside class="rail rail-left">
+        <section class="panel score-panel">
+          <span class="label">Score</span>
+          <strong id="score" class="score-value">0</strong>
+        </section>
+        <section class="panel stats-panel">
+          <div class="mini"><span class="label">Lines</span><strong id="lines">0</strong></div>
+          <div class="mini"><span class="label">Combo</span><strong id="combo" class="combo">—</strong></div>
+          <div class="mini"><span class="label">Level</span><strong id="level">1</strong></div>
+        </section>
+      </aside>
+
+      <!-- CENTER STAGE -->
+      <section class="stage" id="stage">
+        <div class="stage-bg" aria-hidden="true"></div>
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="overlay"></canvas>
+        <div class="stage-tint" aria-hidden="true"></div>
+
+        <div class="board-shell" aria-label="Playfield">
+          <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
+          <div class="board-frame" id="boardFrame">
+            <canvas id="board" width="320" height="640"></canvas>
+            <div id="floatLayer" class="float-layer"></div>
+            <div id="clearFlash" class="clear-flash"></div>
+          </div>
+        </div>
+
+        <div class="pad" aria-hidden="true">
+          <div class="cap cap-lb" id="ctlRotL"><b>LB</b><span>ROTATE ⟲</span></div>
+          <div class="cap cap-a" id="ctlDrop"><b>A</b><span>DROP</span></div>
+          <div class="cap cap-rb" id="ctlRotR"><b>RB</b><span>ROTATE ⟳</span></div>
+        </div>
+
+        <div id="tutPop" class="tut-pop" aria-hidden="true"></div>
+
+        <div id="message" class="toast">Stand 1.5–3 m from the camera and raise both hands to begin.</div>
+
+        <button id="tutorialSkip" class="tutorial-skip">Skip lesson ⏭</button>
+      </section>
+
+      <!-- RIGHT RAIL -->
+      <aside class="rail rail-right">
+        <section class="panel next-panel">
+          <span class="label">Next</span>
+          <canvas id="nextCanvas" width="176" height="258"></canvas>
+        </section>
+        <section class="panel guide-panel">
+          <span class="label">Gesture Map</span>
+          <ul class="guide">
+            <li><b>HEAD</b><span>move left / right</span></li>
+            <li><b>L-HAND ↓</b><span>rotate ⟲</span></li>
+            <li><b>R-HAND ↓</b><span>rotate ⟳</span></li>
+            <li><b>BOTH ↓</b><span>hard drop</span></li>
+          </ul>
+        </section>
+        <section class="panel controls-panel">
+          <button id="startBtn" class="btn btn-primary">▶&ensp;Start with Camera</button>
+          <div class="btn-row">
+            <button id="pauseBtn" class="btn" disabled>Pause</button>
+            <button id="restartBtn" class="btn">Restart</button>
+          </div>
+          <button id="soundBtn" class="btn">🔊&ensp;Sound On</button>
+          <label class="toggle"><input id="mirrorToggle" type="checkbox" checked /><span>Mirror camera</span></label>
+        </section>
+      </aside>
+    </main>
+
+    <!-- ===== Attract screen（全屏覆盖，盖住摄像头与 HUD） ===== -->
+    <div class="title-screen" id="titleScreen">
+      <div class="title-inner">
+        <p class="eyebrow">MINXIN AI&nbsp;&amp;&nbsp;STEAM PRESENTS</p>
+        <h1 class="game-logo">FITNESS<br /><span>TETRIS</span></h1>
+        <p class="tagline">MOVE YOUR BODY · CLEAR THE LINES · CHASE THE COMBO</p>
+        <div class="cta-row">
+          <button id="titleStart" class="btn btn-primary">▶&ensp;Start Session</button>
+          <button id="titleSkip" class="btn">⌨&ensp;Keyboard Mode</button>
+        </div>
+        <ul class="chips-legend">
+          <li><b>HEAD ◍</b> move left / right</li>
+          <li><b>L-HAND ↓</b> rotate ⟲</li>
+          <li><b>R-HAND ↓</b> rotate ⟳</li>
+          <li><b>BOTH ↓</b> hard drop</li>
+        </ul>
+        <p class="fineprint">Camera needs your permission — everything runs locally in your browser.</p>
+        <p class="fineprint kbd">⌨ KEYBOARD · <b>← → / A D</b> move · <b>Q Z / E X</b> rotate · <b>SPACE</b> hard drop · <b>↓ / S</b> soft drop · <b>ESC</b> pause · <b>M</b> mute</p>
+      </div>
+    </div>
+
+    <!-- ===== Pause menu（全屏覆盖） ===== -->
+    <div id="pauseOverlay" class="pause-overlay">
+      <div class="pause-title">PAUSED</div>
+      <div class="pause-menu">
+        <button id="pauseContinue" class="pause-item">▸&ensp;RESUME</button>
+        <button id="pauseRestart" class="pause-item">↻&ensp;RESTART</button>
+      </div>
+    </div>
+
+    <!-- ===== Game Over 弹屏 ===== -->
+    <div id="gameOverOverlay" class="gameover-overlay">
+      <div class="go-inner">
+        <p class="go-eyebrow">RUN COMPLETE</p>
+        <h2 class="go-title">GAME OVER</h2>
+        <div class="go-stats">
+          <div class="go-stat"><span>Score</span><strong id="goScore">0</strong></div>
+          <div class="go-stat"><span>Lines</span><strong id="goLines">0</strong></div>
+          <div class="go-stat"><span>Level</span><strong id="goLevel">1</strong></div>
+          <div class="go-stat"><span>Best</span><strong id="goBest">0</strong></div>
+        </div>
+        <p id="goBestTag" class="go-best">★&ensp;NEW PERSONAL BEST</p>
+        <div class="go-actions">
+          <button id="goPlay" class="btn btn-primary">↻&ensp;Play Again</button>
+          <button id="goMenu" class="btn">■&ensp;Main Menu</button>
+        </div>
+        <p class="fineprint">Press <b>SPACE</b> / <b>ENTER</b> to retry</p>
+      </div>
+    </div>
+
+    <!-- ===== Bottom bar ===== -->
+    <footer class="bottombar">
+      <span class="kb-legend">KEYBOARD · <b>← → / A D</b> move · <b>Q Z / E X / ↑</b> rotate · <b>SPACE</b> hard drop · <b>↓ / S</b> soft drop · <b>P</b> pause · <b>R</b> restart · <b>M</b> mute</span>
+      <span class="credit">MINXIN AI&amp;STEAM · 2026</span>
+    </footer>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
