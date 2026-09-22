@@ -53,7 +53,7 @@
         <div class="board-shell" aria-label="Playfield">
           <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
           <div class="board-frame" id="boardFrame">
-            <canvas id="board" width="320" height="640"></canvas>
+            <canvas id="board" width="480" height="960"></canvas>
             <div id="floatLayer" class="float-layer"></div>
             <div id="clearFlash" class="clear-flash"></div>
           </div>
@@ -94,6 +94,14 @@
             <button id="restartBtn" class="btn">Restart</button>
           </div>
           <button id="soundBtn" class="btn">🔊&ensp;Sound On</button>
+          <div class="size-row">
+            <span>Board size</span>
+            <div class="size-btns">
+              <button class="btn size-btn" data-board="s" title="Compact">S</button>
+              <button class="btn size-btn" data-board="m" title="Default (eye-friendly)">M</button>
+              <button class="btn size-btn" data-board="l" title="Maximum">L</button>
+            </div>
+          </div>
           <label class="toggle"><input id="mirrorToggle" type="checkbox" checked /><span>Mirror camera</span></label>
         </section>
       </aside>

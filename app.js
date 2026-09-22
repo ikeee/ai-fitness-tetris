@@ -189,7 +189,7 @@ function drawGridAndPose(landmarks){
   const sr=stage.getBoundingClientRect(), br=boardCanvas.getBoundingClientRect();
   const bx=(br.left-sr.left)*dpr, by=(br.top-sr.top)*dpr, bw=br.width*dpr, bh=br.height*dpr;
   octx.save();
-  octx.fillStyle="#ffc900"; octx.font=`700 ${Math.max(11,12*dpr)}px "Courier New", monospace`;
+  octx.fillStyle="#ffc900"; octx.font=`700 ${Math.max(14,15*dpr)}px "Courier New", monospace`;
   octx.textAlign="center"; octx.textBaseline="middle";
   const rowH=bh/ROWS, colW=bw/COLS;
   for(let r=0;r<ROWS;r++){
@@ -225,26 +225,26 @@ function roundRectPath(x,y,w,h,r){
   return p;
 }
 function drawBlock(ctx,x,y,w,h,color){
-  const r=Math.min(w,h)*0.18;
-  const p=roundRectPath(x+1.5,y+1.5,w-3,h-3,r);
+  const r=Math.min(w,h)*0.16;
+  const p=roundRectPath(x+2,y+2,w-4,h-4,r);
   ctx.save();
-  ctx.shadowColor=color; ctx.shadowBlur=Math.max(6,w*0.22);
+  ctx.shadowColor=color; ctx.shadowBlur=Math.max(8,w*0.3);
   ctx.fillStyle=color; ctx.fill(p);
   ctx.shadowBlur=0;
   const g=ctx.createLinearGradient(0,y,0,y+h);
-  g.addColorStop(0,"rgba(255,255,255,.42)");
-  g.addColorStop(.42,"rgba(255,255,255,.08)");
-  g.addColorStop(1,"rgba(0,0,0,.30)");
+  g.addColorStop(0,"rgba(255,255,255,.50)");
+  g.addColorStop(.42,"rgba(255,255,255,.10)");
+  g.addColorStop(1,"rgba(0,0,0,.32)");
   ctx.fillStyle=g; ctx.fill(p);
-  ctx.strokeStyle="rgba(255,255,255,.35)"; ctx.lineWidth=1; ctx.stroke(p);
+  ctx.strokeStyle="rgba(255,255,255,.52)"; ctx.lineWidth=Math.max(1.5,w*0.05); ctx.stroke(p);
   ctx.restore();
 }
 function drawGhost(ctx,x,y,w,h,color){
   const r=Math.min(w,h)*0.18;
   const p=roundRectPath(x+2.5,y+2.5,w-5,h-5,r);
   ctx.save();
-  ctx.globalAlpha=.34; ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke(p);
-  ctx.globalAlpha=.10; ctx.fillStyle=color; ctx.fill(p);
+  ctx.globalAlpha=.5; ctx.strokeStyle=color; ctx.lineWidth=Math.max(2,w*0.06); ctx.stroke(p);
+  ctx.globalAlpha=.16; ctx.fillStyle=color; ctx.fill(p);
   ctx.restore();
 }
 function draw(){
@@ -253,7 +253,7 @@ function draw(){
   const bg=bctx.createLinearGradient(0,0,0,h);
   bg.addColorStop(0,"rgba(8,16,28,.34)"); bg.addColorStop(1,"rgba(3,7,14,.5)");
   bctx.fillStyle=bg; bctx.fillRect(0,0,w,h);
-  bctx.strokeStyle="rgba(140,200,255,.13)"; bctx.lineWidth=1;
+  bctx.strokeStyle="rgba(150,205,255,.2)"; bctx.lineWidth=2;
   for(let x=0;x<=COLS;x++){ bctx.beginPath(); bctx.moveTo(x*cw+.5,0); bctx.lineTo(x*cw+.5,h); bctx.stroke(); }
   for(let y=0;y<=ROWS;y++){ bctx.beginPath(); bctx.moveTo(0,y*ch+.5); bctx.lineTo(w,y*ch+.5); bctx.stroke(); }
   if(active && !paused && !gameOver){
@@ -623,6 +623,18 @@ window.addEventListener("keyup",e=>{
   else if(e.code==="ArrowDown"||e.code==="KeyS") releaseHeld("down");
 });
 window.addEventListener("blur",releaseAllHeld);
+
+/* ---------- 棋盘尺寸档位（S/M/L，为"2–3 米外看清"设计） ---------- */
+function setBoardSize(s){
+  const size=["s","m","l"].includes(s)?s:"m";
+  document.documentElement.dataset.board=size;
+  try{ localStorage.setItem("fitnessTetrisBoard",size); }catch(e){}
+  document.querySelectorAll(".size-btn").forEach(b=>b.classList.toggle("active",b.dataset.board===size));
+  setupOverlay(); draw();
+  requestAnimationFrame(()=>drawGridAndPose(null));
+}
+document.querySelectorAll(".size-btn").forEach(b=>b.addEventListener("click",()=>setBoardSize(b.dataset.board)));
+
 titleStart.addEventListener("click",()=>{ hideTitle(); start(); });
 titleSkip.addEventListener("click",()=>{ hideTitle(); startKeyboard(); });
 if(tutorialSkip) tutorialSkip.addEventListener("click",skipLesson);
@@ -641,4 +653,5 @@ window.addEventListener("resize",()=>{ setupOverlay(); draw(); });
 
 setupOverlay(); video.style.transform="scaleX(-1)"; resetGame();
 updateBest();
+setBoardSize((()=>{ try{ return localStorage.getItem("fitnessTetrisBoard")||"m"; }catch(e){ return "m"; } })());
 requestAnimationFrame(()=>drawGridAndPose(null));

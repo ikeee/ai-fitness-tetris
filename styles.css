@@ -9,6 +9,8 @@
 @font-face{font-family:"Rajdhani";src:url("./fonts/rajdhani-latin-700-normal.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap;}
 
 :root{
+  /* 棋盘高度占舞台（视口）比例：S/M/L 三档，默认 M 已按"2–3 米外看清"调大 */
+  --board-h:86%;
   --bg0:#04070d;
   --bg1:#0a1220;
   --panel-a:rgba(13,22,36,.86);
@@ -102,8 +104,18 @@ body{
   background:radial-gradient(122% 88% at 50% 44%, transparent 52%, rgba(2,6,14,.62) 100%);}
 
 /* ---------- board ---------- */
+html[data-board="s"]{--board-h:76%;}
+html[data-board="m"]{--board-h:86%;}
+html[data-board="l"]{--board-h:90%;}
+/* L 档：收起底栏与顶栏留白，把省下的高度全给棋盘（远距离看清优先） */
+html[data-board="l"] .bottombar{display:none;}
+html[data-board="l"] .topbar{padding:4px 2px 6px;}
+html[data-board="l"] .board-shell{top:53%;}
+
 .board-shell{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;
-  height:72%;aspect-ratio:1/2;filter:drop-shadow(0 24px 44px rgba(0,0,0,.6));}
+  /* 取"目标比例"与"不压到左右 HUD 的最大宽度"两者的小值：棋盘宽 = 高/2，两侧 HUD 约 620px */
+  height:min(var(--board-h), calc(2 * (100vw - 620px)));
+  aspect-ratio:1/2;filter:drop-shadow(0 24px 44px rgba(0,0,0,.6));}
 .board-frame{position:relative;width:100%;height:100%;border-radius:12px;overflow:hidden;
   border:1px solid rgba(150,210,255,.35);
   box-shadow:inset 0 0 46px rgba(0,0,0,.55), 0 0 34px rgba(63,224,255,.12);}
@@ -249,6 +261,12 @@ body{
 
 .controls-panel{display:flex;flex-direction:column;gap:10px;}
 .controls-panel .btn{width:100%;}
+.size-row{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#bdd7ea;}
+.size-btns{display:inline-flex;gap:6px;}
+.size-btn{width:36px;height:30px;padding:0;font-size:12.5px;letter-spacing:0;}
+.size-btn.active{background:linear-gradient(180deg,#4ee3ff,#0b8dc4);color:#02141d;border-color:#9ceeff;
+  box-shadow:0 0 14px rgba(63,224,255,.35);}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .toggle{display:flex;align-items:center;gap:9px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#bdd7ea;cursor:pointer;}
 .toggle input{accent-color:var(--cyan);width:15px;height:15px;cursor:pointer;}
