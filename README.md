@@ -8,9 +8,11 @@ Built as a classroom demo for **Minxin School · AI & STEAM**. Runs 100% in the 
 
 ## Features
 - **Full-screen camera stage** — the live camera fills the screen and the whole HUD floats on top of it
+- **Adjustable playfield (S / M / L)** — default M is sized so the board reads clearly from 2–3 m away in a classroom
 - **Level 1 is a tutorial level** — 4 guided tasks (move / rotate ⟲ / rotate ⟳ / hard drop) with pop-up prompts, `✓ NICE!` feedback and a `LEVEL 1 COMPLETE` payoff
 - Console-grade UI: attract screen, HUD rails, **NEXT ×3** queue, ghost piece, danger pulse, line-clear flash, and a **GAME OVER** pop-up with run stats
 - **Full keyboard mapping with DAS auto-repeat** (frame-synced hold-to-move)
+- **Head control that stays put** — tilt further to shift more cells; returning your head to centre never drags the piece back
 - **BGM + 12 SFX synthesized with WebAudio** — zero audio assets; toggle with the 🔊 button or `M`
 - Best score persisted locally (localStorage)
 
@@ -18,7 +20,7 @@ Built as a classroom demo for **Minxin School · AI & STEAM**. Runs 100% in the 
 
 | Action | Gesture | Keyboard |
 |---|---|---|
-| Move left / right | head tilts left / right | `←` `→` or `A` `D` (hold = repeat) |
+| Move left / right | head tilts left / right (tilt further = more cells) | `←` `→` or `A` `D` (hold = repeat) |
 | Rotate ⟲ / ⟳ | left / right hand pushes down | `Q` `Z` / `E` `X` `↑` |
 | Hard drop ⚡ | both hands push down | `SPACE` |
 | Soft drop | — | `↓` or `S` (hold = repeat) |
@@ -58,6 +60,7 @@ _backup_v1_2026-09-21/   the original 1:1 clone of the reference video (pre-rede
 
 ## Version
 
+- **v0.02** — classroom readability + control fix: S/M/L playfield size presets (default M = +19.6 % linear / +43 % area), higher-contrast blocks and brighter grid, and reworked head control (absolute neutral + outward-only ratchet — coming back to centre no longer drags the piece back).
 - **v0.01** — first versioned release: fullscreen console layout, tutorial level, full keyboard mapping + DAS, synthesized music & SFX, game-over screen.
 
 ---
